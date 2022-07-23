@@ -11,7 +11,11 @@ app.use('/graphql', graphqlHTTP({
 }));
 
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log("Express GraphQL server is running");
-});
+// const PORT = process.env.PORT || 3000;
+app.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
+    console.log(`
+      🚀  Server is ready at ${url}
+      📭  Query at https://studio.apollographql.com/dev
+    `);
+  });
+  
