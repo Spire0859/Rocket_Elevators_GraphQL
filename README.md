@@ -20,7 +20,6 @@ in order you may answer the question by writing the following query @ https://ro
           interventionDateEnd
         }
       }
-
     }
 
 2 {
