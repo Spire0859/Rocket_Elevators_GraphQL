@@ -12,7 +12,8 @@ this program answers three main questions, being :
 
 in order you may answer the question by writing the following query @ https://rocketelevatorsgraphqlspireee.herokuapp.com/graphql
 
-1 {
+```
+1. {
       building(id:1){
         addressOfBuilding
         intervention{
@@ -22,7 +23,7 @@ in order you may answer the question by writing the following query @ https://ro
       }
     }
 
-2 {
+2. {
     customer(id:1){
       building{
         intervention{
@@ -39,7 +40,6 @@ in order you may answer the question by writing the following query @ https://ro
         }
       }
     }
-
   }
   
   ps - each building currently only have 1 intervention 
@@ -53,5 +53,4 @@ in order you may answer the question by writing the following query @ https://ro
           }
         }	
       }
-
     }
