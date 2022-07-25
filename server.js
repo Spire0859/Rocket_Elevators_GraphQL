@@ -56,36 +56,6 @@ let connectio = connection.promise();
 
 
 
-//Type creation
-// const InterventionOBJ = new GraphQLObjectType({
-//   name: "Intervention",
-//   description: "This is an intervention",
-//   fields: () => ({
-//     id: { type: GraphQLInt },
-//     building_id: { type: GraphQLString },
-//     employee_id: { type: GraphQLString },
-//     battery_id: { type: GraphQLString },
-//     column_id: { type: GraphQLString },
-//     elevator_id: { type: GraphQLString },
-//     interventionDateStart: { type: GraphQLString },
-//    interventionDateEnd: { type: GraphQLString },
-//     intervention_start: { type: GraphQLDateTime },
-//     intervention_end: { type: GraphQLDateTime },
-//     result: { type: GraphQLString },
-//     report: { type: GraphQLString },
-//     status: { type: GraphQLString },
-//     building: {
-//       type: BuildingOBJ,
-//       resolve: async (intervention, args) => {
-//         const [rows, fields] = await connectio.query(
-//           `SELECT * FROM buildings WHERE id = ${intervention.building_id}`
-//         );
-//         return rows[0];
-//       },
-//     },
-//   }),
-// });
-
 const addresse = new GraphQLObjectType({
   name: "Address",
   description: "This is an address",
@@ -103,6 +73,17 @@ const addresse = new GraphQLObjectType({
   }),
 });
 
+const building_detailsOBJ = new GraphQLObjectType({
+  name: "building_details",
+  description: "This is a building_detail",
+  fields: () => ({
+    id: { type: GraphQLInt },
+    InformationKey: { type: GraphQLString },
+    Value: { type: GraphQLString },
+    building_id: { type: GraphQLInt },
+  }),
+});
+
 const BuildingOBJ = new GraphQLObjectType({
   name: "Building",
   description: "This is a building",
@@ -117,7 +98,80 @@ const BuildingOBJ = new GraphQLObjectType({
     phone_technical_authority: { type: GraphQLString },
     interventionDateStart: { type: GraphQLString },
     interventionDateEnd: { type: GraphQLString },
-    customer_id: {type: GraphQLInt }
+    customer_id: {type: GraphQLInt },
+    intervention: { 
+      type:  new GraphQLList(InterventionOBJ),
+      resolve: async (parent) => {
+        const rows = await connectio.query(
+          `SELECT * FROM interventions WHERE building_id = ${parent.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+
+    },
+    building_details: { 
+      type:  new GraphQLList(building_detailsOBJ),
+      resolve: async (parent) => {
+        const rows = await connectio.query(
+          `SELECT * FROM building_details WHERE building_id = ${parent.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+
+    }
+  }),
+});
+
+const InterventionOBJ = new GraphQLObjectType({
+  name: "Intervention",
+  description: "This is an intervention",
+  fields: () => ({
+    id: { type: GraphQLInt },
+    interventionDateStart: { type: GraphQLString},
+    interventionDateEnd: { type: GraphQLString },
+    result: { type: GraphQLString },
+    report: { type: GraphQLString },
+    status: { type: GraphQLString },
+    employee_id: { type: GraphQLInt },
+    building_id: { type: GraphQLInt },
+    batterie_id: { type: GraphQLInt },
+    column_id: { type: GraphQLInt },
+    elevator_id: { type: GraphQLInt },
+    building: { 
+      type:  new GraphQLList(BuildingOBJ),
+      resolve: async (parent) => {
+        const rows = await connectio.query(
+          `SELECT * FROM buildings WHERE id = ${parent.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+    }
+  }),
+});
+
+const EmployeeOBJ = new GraphQLObjectType({
+  name: "Employee",
+  description: "This is an employee",
+  fields: () => ({
+    id: { type: GraphQLInt },
+    firstNname: { type: GraphQLString },
+    lastName: { type: GraphQLString },
+    title: { type: GraphQLString },
+    user_id: { type: GraphQLInt },
+    intervention: { 
+      type:  new GraphQLList(InterventionOBJ),
+      resolve: async (parent) => {
+        const rows = await connectio.query(
+          `SELECT * FROM interventions WHERE employee_id = ${parent.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+
+    }
   }),
 });
 
@@ -135,7 +189,18 @@ const CustomerOBJ  = new GraphQLObjectType({
     fullNameTechnicalAuthority: { type: GraphQLString },
     technicalAuthorityPhone: { type: GraphQLString },
     technicalAuthorityEmail: {type: GraphQLString },
-    user_id: { type: GraphQLInt }
+    user_id: { type: GraphQLInt },
+    building: { 
+      type:  new GraphQLList(BuildingOBJ),
+      resolve: async (parent) => {
+        const rows = await connectio.query(
+          `SELECT * FROM buildings WHERE customer_id = ${parent.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+
+    }
   }),
 });
 
@@ -143,7 +208,7 @@ const CustomerOBJ  = new GraphQLObjectType({
 
 const Query = new GraphQLObjectType({
   name: "Query",
-  description: "Root Query",
+  description: "Query",
   fields: () => ({
    
     address: {
@@ -163,6 +228,35 @@ const Query = new GraphQLObjectType({
       },
     },
 
+    intervention: {
+      type: InterventionOBJ,
+      description: "An intervention",
+
+      args: {
+        id: { type: GraphQLInt },
+      },
+
+      resolve: async (parent, args) => {
+        const [rows, fields] = await connectio.query(
+          `SELECT * FROM interventions WHERE id = ${args.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+    },
+
+    buildings: {
+      type: new GraphQLList(BuildingOBJ),
+      description: "List of all buildings",
+      resolve: async (parent, args) => {
+        const [rows, fields] = await connectio.query(
+          `SELECT * FROM buildings`
+        );
+        console.log(rows);
+        return rows;
+      },
+    },
+
     building: {
       type: BuildingOBJ,
       description: "A building",
@@ -179,6 +273,24 @@ const Query = new GraphQLObjectType({
         return rows[0];
       },
     },
+    
+    employee: {
+      type: EmployeeOBJ,
+      description: "A building",
+
+      args: {
+        id: { type: GraphQLInt },
+      },
+
+      resolve: async (parent, args) => {
+        const [rows, fields] = await connectio.query(
+          `SELECT * FROM employees WHERE id = ${args.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+    },
+
     customer: {
       type: CustomerOBJ,
       description: "A customer",
