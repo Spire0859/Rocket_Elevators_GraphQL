@@ -73,16 +73,6 @@ const addresse = new GraphQLObjectType({
   }),
 });
 
-const building_detailsOBJ = new GraphQLObjectType({
-  name: "building_details",
-  description: "This is a building_detail",
-  fields: () => ({
-    id: { type: GraphQLInt },
-    InformationKey: { type: GraphQLString },
-    Value: { type: GraphQLString },
-    building_id: { type: GraphQLInt },
-  }),
-});
 
 const BuildingOBJ = new GraphQLObjectType({
   name: "Building",
@@ -110,6 +100,19 @@ const BuildingOBJ = new GraphQLObjectType({
       },
 
     },
+
+    battery: { 
+      type:  new GraphQLList(BatteryOBJ),
+      resolve: async (parent) => {
+        const rows = await connectio.query(
+          `SELECT * FROM batteries WHERE building_id = ${parent.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+
+    },
+
     building_details: { 
       type:  new GraphQLList(building_detailsOBJ),
       resolve: async (parent) => {
@@ -123,6 +126,96 @@ const BuildingOBJ = new GraphQLObjectType({
     }
   }),
 });
+
+
+const BatteryOBJ = new GraphQLObjectType({
+  name: "Battery",
+  description: "This is a battery",
+  fields: () => ({
+    id: { type: GraphQLInt },
+    types: { type: GraphQLString},
+    status: { type: GraphQLString },
+    date_commissioning: { type: GraphQLDateTime },
+    date_last_inspection: { type: GraphQLDateTime },
+    certificate_of_operations: { type: GraphQLString },
+    building_id: { type: GraphQLInt },
+    created_at: { type: GraphQLDateTime },
+    updated_at: { type: GraphQLDateTime },
+    culumn: { 
+      type:  new GraphQLList(ColumnOBJ),
+      resolve: async (parent) => {
+        const rows = await connectio.query(
+          `SELECT * FROM columns WHERE battery_id = ${parent.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+    }
+  }),
+});
+
+const ColumnOBJ = new GraphQLObjectType({
+  name: "Column",
+  description: "This is a column",
+  fields: () => ({
+    id: { type: GraphQLInt },
+    types: { type: GraphQLString},
+    model: { type: GraphQLString },
+    numberFloorServed: { type: GraphQLString },
+    status: { type: GraphQLString },
+    information: { type: GraphQLString },
+    notes: { type: GraphQLString },
+    battery_id: { type: GraphQLInt },
+    created_at: { type: GraphQLDateTime },
+    updated_at: { type: GraphQLDateTime },
+    elevator: { 
+      type:  new GraphQLList(ElevatorOBJ),
+      resolve: async (parent) => {
+        const rows = await connectio.query(
+          `SELECT * FROM elevators WHERE column_id = ${parent.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+    }
+  }),
+});
+
+const ElevatorOBJ = new GraphQLObjectType({
+  name: "Elevator",
+  description: "This is an elevator",
+  fields: () => ({
+    id: { type: GraphQLInt },
+    serial_number: { type: GraphQLInt},
+    companyName: { type: GraphQLString },
+    model: { type: GraphQLString },
+    fullName: { type: GraphQLString },
+    email: { type: GraphQLString },
+    types: { type: GraphQLString },
+    status: { type: GraphQLString },
+    dateCommissioning: { type: GraphQLDateTime },
+    dateLastInspection: { type: GraphQLDateTime },
+    certificateOperations: { type: GraphQLString },
+    information: { type: GraphQLString },
+    notes: { type: GraphQLString },
+    column_id: { type: GraphQLInt },
+    created_at: { type: GraphQLDateTime },
+    updated_at: { type: GraphQLDateTime },
+  }),
+});
+
+const building_detailsOBJ = new GraphQLObjectType({
+  name: "building_details",
+  description: "This is a building_detail",
+  fields: () => ({
+    id: { type: GraphQLInt },
+    InformationKey: { type: GraphQLString },
+    Value: { type: GraphQLString },
+    building_id: { type: GraphQLInt },
+  }),
+});
+
+
 
 const InterventionOBJ = new GraphQLObjectType({
   name: "Intervention",
@@ -268,6 +361,57 @@ const Query = new GraphQLObjectType({
       resolve: async (parent, args) => {
         const [rows, fields] = await connectio.query(
           `SELECT * FROM buildings WHERE id = ${args.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+    },
+
+    battery: {
+      type: BatteryOBJ,
+      description: "A Battery",
+
+      args: {
+        id: { type: GraphQLInt },
+      },
+
+      resolve: async (parent, args) => {
+        const [rows, fields] = await connectio.query(
+          `SELECT * FROM batteries WHERE id = ${args.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+    },
+
+    column: {
+      type: ColumnOBJ,
+      description: "A column",
+
+      args: {
+        id: { type: GraphQLInt },
+      },
+
+      resolve: async (parent, args) => {
+        const [rows, fields] = await connectio.query(
+          `SELECT * FROM columns WHERE id = ${args.id}`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+    },
+
+    elevator: {
+      type: ElevatorOBJ,
+      description: "An elevator",
+
+      args: {
+        id: { type: GraphQLInt },
+      },
+
+      resolve: async (parent, args) => {
+        const [rows, fields] = await connectio.query(
+          `SELECT * FROM elevators WHERE id = ${args.id}`
         );
         console.log(rows[0]);
         return rows[0];
