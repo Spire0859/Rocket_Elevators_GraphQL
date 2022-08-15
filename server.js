@@ -308,6 +308,23 @@ const Query = new GraphQLObjectType({
       },
     },
 
+    customerEmail: {
+      type: CustomerOBJ,
+      description: "A customer",
+
+      args: {
+        email: { type: GraphQLString },
+      },
+
+      resolve: async (parent, args) => {
+        const [rows, fields] = await connectio.query(
+          `SELECT * FROM customers WHERE email = "${args.email}"`
+        );
+        console.log(rows[0]);
+        return rows[0];
+      },
+    },
+
     
   
 
