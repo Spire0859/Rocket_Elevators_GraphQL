@@ -20,10 +20,10 @@ const { Sequelize, Model, DataTypes } = require("sequelize");
 
 const {Client} = require('pg')
 const pg = new Client({
-    host: 'codeboxx-postgresql.cq6zrczewpu2.us-east-1.rds.amazonaws.com',
-    user: 'codeboxx',
-    password: 'Codeboxx1!',
-    database: 'MarcosLopez'
+    host: 'HOST',
+    user: 'USER',
+    password: 'PASS WORD!',
+    database: ''
 });
 pg.connect(function (error) {
   if (!!error) {
@@ -38,10 +38,10 @@ var mysql = require('mysql2');
 const { json } = require("express");
 //const { resolve } = require('path');
 var connection = mysql.createConnection({
-    host: 'codeboxx.cq6zrczewpu2.us-east-1.rds.amazonaws.com',
-    user: 'codeboxx',
-    password: 'Codeboxx1!',
-    database: 'Tanim_Khondaker_development'  
+    host: 'HOST',
+    user: 'USER',
+    password: 'PASS WORD!',
+    database: ''  
 
 });
 connection.connect(function(error){
