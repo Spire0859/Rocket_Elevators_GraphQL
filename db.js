@@ -16,10 +16,10 @@ import _ from 'lodash';
 var mysql = require('mysql');
 //const { resolve } = require('path');
 var connectio = mysql.createConnection({
-    host: 'codeboxx.cq6zrczewpu2.us-east-1.rds.amazonaws.com',
-    user: 'codeboxx',
-    password: 'Codeboxx1!',
-    database: 'Tanim_Khondaker_development'  
+    host: 'HOST NAME',
+    user: 'USER NAME',
+    password: 'PASS',
+    database: ''  
 
 });
 connectio.connect(function(error){
